@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 2vw;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+
+            overflow: hidden;
+        }
+
+
+        /*  */
+        .center {
+
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        .wave {
+            width: 5px;
+            height: 100px;
+            background: linear-gradient(45deg, cyan, #fff);
+            margin: 10px;
+            animation: wave 1s linear infinite;
+            border-radius: 20px;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .wave:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .wave:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        .wave:nth-child(6) {
+            animation-delay: 0.5s;
+        }
+
+        .wave:nth-child(7) {
+            animation-delay: 0.6s;
+        }
+
+        .wave:nth-child(8) {
+            animation-delay: 0.7s;
+        }
+
+        .wave:nth-child(9) {
+            animation-delay: 0.8s;
+        }
+
+        .wave:nth-child(10) {
+            animation-delay: 0.9s;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(0);
+            }
+        }
+
+        #Wallpaper_show {
+            display: none;
+            cursor: none;
+
+
+        }
+
+        #real_settings_form {
+            background-color: #d0d9d8;
+            display: flex;
+            row-gap: 3vh;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
+            align-items: center;
+            box-sizing: border-box;
+            border: 3vh;
+
+            border-style: solid;
+            border-color: #828483;
+
+        }
+
+
+        #start_btn {
+            background-color: black;
+            color: aliceblue;
+            padding: 5px;
+            cursor: pointer;
+
+        }
+
+        #title {
+            font-family: cursive;
+            font-size: 3.3vw;
+            text-align: center;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 9vh;
+            background-image: linear-gradient(-225deg,
+                    #231557 0%,
+                    #0bb89b 29%,
+                    #ff1361 67%,
+                    #fff800 100%);
+
+
+            animation: textclip 2s linear infinite;
+
+            background-size: 40%;
+            background-clip: text;
+            -webkit-background-clip: text;
+
+
+
+
+        }
+
+        @keyframes textclip {
+
+            to {
+                background-position: 200%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="center">
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+    <div id="settings">
+
+        <div id="real_settings">
+
+            <form id="real_settings_form" action="">
+                <span id="title">PIXEL PARADISE: Your Random Wallpaper Oasis</span>
+                <span>Mode: <select id="mode">
+                        <option selected value="single">Single</option>
+                        <option value="repeat">Slideshow</option>
+                        <option value="unique">Unique Slideshow</option>
+                    </select></span>
+
+                <span>Delay in Seconds:<input type="number" required min="4" max="100" disabled id="time_gap"></span>
+                <span>Number of Images:<input type="number" required min="2" max="10" disabled id="n_images"></span>
+                <input id="start_btn" type="submit" value="START">
+            </form>
+        </div>
+    </div>
+    <div id="Wallpaper_show"><img id="image_wall" src="" alt="Some error Occured">
+    </div>
+
+
+
+    <script>
+        const mode_drop_down = document.getElementById("mode")
+        const time_interval = document.getElementById("time_gap")
+        const modeSelect = document.getElementById("mode");
+        const n_images = document.getElementById("n_images");
+        const real_settings_form = document.getElementById("real_settings_form");
+        const loading = document.getElementsByClassName("center")[0];
+
+
+
+
+        mode_drop_down.addEventListener("change", function (event) {
+            time_interval.value = "";
+            n_images.value = "";
+            if (modeSelect.value != "single") {
+                time_interval.disabled = 0;
+
+            }
+            else {
+                time_interval.disabled = 1;
+
+            }
+            if (modeSelect.value == "repeat") {
+
+                n_images.disabled = 0;
+            }
+            else {
+                n_images.disabled = 1;
+            }
+
+        });
+        const settings_e = document.getElementById("settings");
+        const wall_show = document.getElementById("Wallpaper_show");
+        const screen_height = window.screen.height;
+        const screen_width = window.screen.width;
+        let unique_timer;
+        let images = [];
+        function remove_loading_screen() {
+            loading.style.display = "none";
+
+            wall_show.firstElementChild.removeEventListener('load', remove_loading_screen);
+        };
+        const wall_links = [
+            `https://picsum.photos/${screen_width}/${screen_height}?random=${Math.floor(Math.random() * (100))}`,
+
+            `https://source.unsplash.com/random/${screen_width}x${screen_height}?sig=${Math.floor(Math.random() * (100))}`
+        ]
+        real_settings_form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent the form from submitting automatically
+            loading.style.display = "flex";
+            wall_show.firstElementChild.addEventListener("load", remove_loading_screen);
+            if (modeSelect.value == "single") {
+                wall_show.firstElementChild.src = wall_links[Math.floor(Math.random() * (wall_links.length))] + "?nocache=" + new Date().getTime();
+                wall_show.firstElementChild.onload = function () {
+                    loading.style.display = "none";
+                };
+
+            }
+            else if (modeSelect.value == "repeat") {
+                let gap = time_interval.value * 1000;
+                let n = n_images.value;
+
+                for (let index = 0; index < n; index++) {
+                    let imageUrl = wall_links[Math.floor(Math.random() * (wall_links.length))];
+                    fetch(imageUrl)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.blob();
+                        })
+                        .then(blob => {
+
+                            const blobUrl = URL.createObjectURL(blob);
+                            images.push(blobUrl);
+
+                        })
+                        .catch(error => {
+                            console.error('Error fetching image:', error);
+                        });
+
+
+
+                }
+                wall_show.firstElementChild.onload = function () {
+                    loading.style.display = "none";
+
+                };
+
+
+                let c = 0;
+
+                unique_timer = setInterval(function () {
+
+                    wall_show.firstElementChild.src = images[c]
+
+                    c++;
+                    if (c == n) {
+                        c = 0;
+                    }
+                }, gap)
+                ///////////////////////////
+
+            }
+            else if (modeSelect.value == "unique") {
+                let gap = time_interval.value * 1000;
+                unique_timer = setInterval(function () {
+
+                    wall_show.firstElementChild.src = wall_links[Math.floor(Math.random() * (wall_links.length))] + "?nocache=" + new Date().getTime();
+                }, gap)
+            }
+
+
+
+
+            document.documentElement.requestFullscreen();
+        });
+        //Switch_fullScreen_smallScreen
+        let small_screen = true;
+        document.addEventListener("fullscreenchange", function () {
+            if (small_screen) {
+                small_screen = false;
+                settings_e.style.display = "none";
+                wall_show.style.display = "block";
+
+            }
+            else {
+                small_screen = true;
+                settings_e.style.display = "";
+                wall_show.style.display = "none";
+                clearInterval(unique_timer);
+                for (let index = 0; index < images.length; index++) {
+
+                    URL.revokeObjectURL(images[index]);
+
+
+                }
+                images = [];
+
+            }
+        });
+
+    </script>
+</body>
+
+</html>
